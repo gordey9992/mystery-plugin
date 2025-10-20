@@ -1,0 +1,22 @@
+name: MysteryPlugin
+version: 1.0.0
+main: com.mystery.plugin.MysteryPlugin
+api-version: "1.21"
+description: Что-то загадочное происходит здесь...
+author: Anonymous
+website: https://github.com/yourusername/mystery-plugin
+
+commands:
+  secret:
+    description: Секретная команда
+    usage: /<command>
+    permission: mystery.secret
+
+permissions:
+  mystery.*:
+    description: Все секретные разрешения
+    children:
+      mystery.secret: true
+  mystery.secret:
+    description: Использование секретной команды
+    default: op
