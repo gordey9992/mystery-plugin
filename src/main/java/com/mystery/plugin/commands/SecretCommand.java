@@ -1,18 +1,44 @@
-package com.mystery.plugin.commands;
+package com.mystery.plugin;
 
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
-import org.jetbrains.annotations.NotNull;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.plugin.java.JavaPlugin;
+import com.mystery.plugin.commands.SecretCommand; // Добавляем импорт
 
-public class SecretCommand implements CommandExecutor {
+public class MysteryPlugin extends JavaPlugin {
+    
+    private static MysteryPlugin instance;
+    private FileConfiguration config;
     
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, 
-                           @NotNull String label, @NotNull String[] args) {
+    public void onEnable() {
+        instance = this;
         
-        sender.sendMessage("§6[Тайна] §fЧто-то загадочное происходит...");
-        // Секретная логика будет добавлена позже
-        return true;
+        // Загрузка конфига
+        saveDefaultConfig();
+        config = getConfig();
+        
+        getLogger().info("Активирую тайные механизмы...");
+        
+        // Инициализация команд
+        initializeCommands();
+        
+        getLogger().info("Тайные механизмы готовы к работе!");
+    }
+    
+    @Override
+    public void onDisable() {
+        getLogger().info("Скрываю следы тайных операций...");
+    }
+    
+    private void initializeCommands() {
+        getCommand("secret").setExecutor(new SecretCommand());
+    }
+    
+    public static MysteryPlugin getInstance() {
+        return instance;
+    }
+    
+    public FileConfiguration getPluginConfig() {
+        return config;
     }
 }
