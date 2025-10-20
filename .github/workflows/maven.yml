@@ -1,0 +1,72 @@
+name: Java CI with Maven
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up JDK 21
+      uses: actions/setup-java@v4
+      with:
+        java-version: '21'
+        distribution: 'temurin'
+        cache: maven
+
+    - name: Build with Maven
+      run: mvn -B package --file pom.xml
+
+    - name: Upload JAR artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: mystery-plugin
+        path: target/*.jar
+        retention-days: 7
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up JDK 21
+      uses: actions/setup-java@v4
+      with:
+        java-version: '21'
+        distribution: 'temurin'
+        cache: maven
+
+    - name: Build release with Maven
+      run: mvn -B package --file pom.xml
+
+    - name: Get version from POM
+      id: version
+      uses: notiz-dev/github-action-json-property@0.1.0
+      with:
+        path: pom.xml
+        prop_path: project.version
+
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: target/*.jar
+        tag_name: v${{ steps.version.outputs.prop }}
+        name: Release v${{ steps.version.outputs.prop }}
+        body: |
+          🎭 Таинственный релиз Mystery Plugin!
+          
+          Что нового:
+          - Секретные улучшения
+          - Загадочные исправления
+          - Неизвестные функции
+        draft: false
+        prerelease: false
